@@ -1,0 +1,69 @@
+---
+// Obfuscation keeps plaintext out of the initial HTML, but is not encryption.
+const email = String(import.meta.env.CONTACT_EMAIL ?? '').trim();
+const parts = Array.from(email, character => character.codePointAt(0)! + 17).reverse().join(',');
+---
+{email ? (
+  <div class="email-contact" data-email-parts={parts}>
+    <button class="email-reveal external-link" type="button" aria-expanded="false" aria-controls="email-actions">
+      <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.5 4.5h17A1.5 1.5 0 0 1 22 6v12a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 18V6a1.5 1.5 0 0 1 1.5-1.5Zm0 2.1v.25l8.5 5.9 8.5-5.9V6.6l-8.5 5.85L3.5 6.6Zm17 2.08-8.07 5.6a.75.75 0 0 1-.86 0L3.5 8.68V18h17V8.68Z"/></svg>
+      Contact by email
+    </button>
+    <div class="email-actions" id="email-actions" hidden>
+      <button class="email-action external-link" type="button" data-email-open>Open email app</button>
+      <button class="email-action external-link" type="button" data-email-copy>Copy email address</button>
+      <span class="email-status" aria-live="polite"><svg class="copy-check" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8 3.2 3.2L13 4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="email-status-text"></span></span>
+      <p class="email-manual" hidden>Copy this address: <span class="email-address" tabindex="0"></span></p>
+    </div>
+    <script is:inline>
+      document.querySelectorAll('.email-contact[data-email-parts]').forEach(contact => {
+        const toggle = contact.querySelector('.email-reveal');
+        const actions = contact.querySelector('.email-actions');
+        const status = contact.querySelector('.email-status');
+        const statusText = contact.querySelector('.email-status-text');
+        const manual = contact.querySelector('.email-manual');
+        const addressText = contact.querySelector('.email-address');
+        let copiedMessageTimer;
+
+        // Decode only after a visitor chooses an email action.
+        const getAddress = () => contact.dataset.emailParts.split(',').reverse()
+          .map(part => String.fromCodePoint(Number(part) - 17)).join('');
+
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          actions.hidden = expanded;
+          if (!expanded) contact.querySelector('[data-email-open]').focus();
+        });
+
+        contact.querySelector('[data-email-open]').addEventListener('click', () => {
+          window.location.href = 'mailto:' + getAddress();
+        });
+
+        contact.querySelector('[data-email-copy]').addEventListener('click', async () => {
+          const address = getAddress();
+          try {
+            if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+            await navigator.clipboard.writeText(address);
+            statusText.textContent = 'Email address copied.';
+            status.dataset.copied = 'true';
+            manual.hidden = true;
+            window.clearTimeout(copiedMessageTimer);
+            copiedMessageTimer = window.setTimeout(() => {
+              statusText.textContent = '';
+              delete status.dataset.copied;
+            }, 3000);
+          } catch {
+            addressText.textContent = address;
+            manual.hidden = false;
+            statusText.textContent = 'Copy failed. Select and copy the address below.';
+            delete status.dataset.copied;
+            addressText.focus();
+          }
+        });
+      });
+    </script>
+  </div>
+) : (
+  <div class="email-contact"><span class="email-pending">Email <span class="small-label">Coming soon</span></span></div>
+)}

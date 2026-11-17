@@ -1,0 +1,16 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"compatibility_date": "2026-11-10",
+	"compatibility_flags": ["global_fetch_strictly_public"],
+	"name": "wilfrid-net",
+	// Astro's Cloudflare adapter supplies the Worker entrypoint when deployed.
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	// Wrangler uploads the built site, not the Astro source files.
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true
+	}
+}

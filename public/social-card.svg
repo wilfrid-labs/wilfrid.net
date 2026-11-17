@@ -1,0 +1,14 @@
+<!-- Editable source for social-card.png. Regenerate the PNG after changing this SVG. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <path d="M80 130h1040M80 530h1040" stroke="#cbd0c4"/>
+  <text x="80" y="95" fill="#315c78" font-family="Arial,sans-serif" font-size="30">Wilfrid Girard · wilfrid.net</text>
+  <g font-family="Georgia,serif" font-size="58">
+    <text x="80" y="245" fill="#20323b">Working across graphics,</text>
+    <text x="80" y="320" fill="#20323b">systems, and AI.</text>
+    <text x="80" y="405" fill="#315c78">Exploring what’s next.</text>
+  </g>
+  <text x="80" y="485" fill="#536360" font-family="Arial,sans-serif" font-size="25">Software engineering · Computer graphics · AI</text>
+</svg>
+
+

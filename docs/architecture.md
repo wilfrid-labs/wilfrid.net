@@ -1,0 +1,14 @@
+# Architecture decisions
+
+## Development philosophy
+
+Prefer simple, clear solutions that are easy to maintain and explain. Use names that make intent apparent, and add concise comments beside code when the reason is not obvious. Record durable decisions in short notes so future contributors can understand and share the reasoning. Keep performance in view by avoiding unnecessary runtime code, dependencies, network requests, and asset weight.
+
+- **Astro + TypeScript** is the foundation. Prerender the professional site and future writing to HTML; use Astro components and plain CSS by default. No framework runtime; a small inline script is included only when email reveal is configured.
+- **Cloudflare Workers** is the deployment target, using the existing Astro Cloudflare adapter. Keep static pages cacheable; introduce on-demand routes only when a feature needs server behavior. This milestone does not deploy or change account settings.
+- **Cloudflare D1** is the planned relational store for applications that need persistent data. No database, binding, authentication, or backend is introduced for the landing page. Design migrations and access boundaries when the first persistent application is scoped.
+- **Keep interactive applications isolated.** WebGPU/WGSL, Three.js, ML models, React Flow, and WebLLM belong on explicitly opened experiment or application routes. Import their bundles only there; never preload them from the landing page. React islands can be added where justified.
+- **Content grows incrementally.** Editable profile and project metadata live in `src/data/site.ts`. Add Markdown/MDX content collections for real writing, and Giscus only on article pages when comments are wanted. Keep independent apps separate from the lightweight professional site.
+- **Privacy and accessibility are defaults.** No analytics, externally hosted fonts, or contact service. Use semantic HTML, visible keyboard focus, and reduced-motion support. 
+
+Revisit these decisions when a concrete feature requires it. Prefer adding capabilities at the point of use over infrastructure for hypothetical needs.
