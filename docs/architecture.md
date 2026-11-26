@@ -13,6 +13,10 @@ Prefer simple, clear solutions that are easy to maintain and explain. Use names 
 
 Revisit these decisions when a concrete feature requires it. Prefer adding capabilities at the point of use over infrastructure for hypothetical needs.
 
+## Visual design
+
+The site uses a white background, dark text, and a muted blue accent. Georgia headings, generous line spacing, and restrained diagrams support unhurried reading. Colors and font stacks are defined in `src/styles/global.css`; system fonts avoid external font requests. Project illustrations are decorative diagrams, not repository screenshots or measured results.
+
 ## Cloudflare routing, redirects, and 404 responses
 
 ### Current functionality
@@ -30,12 +34,4 @@ The homepage is prerendered. The Cloudflare adapter and Wrangler configuration p
 
 Keep routing simple, fast, inexpensive, and maintainable. Prefer Astro's native features, reuse existing Cloudflare capabilities, and avoid unnecessary dependencies.
 
-### Future TODOs
-
-These items are planned, not implemented:
-
-- [ ] Verify Cloudflare deployment mode and required API token permissions.
-- [ ] Implement permanent HTTP 301 redirects for moved pages in Astro.
-- [ ] Create a custom `404.astro` page with a homepage link and helpful suggestions, and verify that unknown URLs return HTTP 404.
-- [ ] Explore suggesting similar valid URLs for mistyped paths.
-- [ ] Investigate lightweight monitoring of 404 requests and broken inbound links using existing Cloudflare capabilities.
+Track outstanding implementation work in [TODO.md](../TODO.md).

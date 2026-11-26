@@ -27,6 +27,9 @@ This site is currently prerendered and is not deployed by ordinary build work.
 Do not edit `package-lock.json` or `worker-configuration.d.ts` by hand. Update
 the social card PNG when changing its SVG source. Do not commit `.env` or logs.
 
+Refresh `docs/images/site-preview.jpg`, the README screenshot, whenever the site's
+visuals change. Follow the capture guidance in `docs/maintenance.md`.
+
 Full documentation: https://docs.astro.build
 
 Consult these guides before working on related tasks:
