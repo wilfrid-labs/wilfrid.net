@@ -23,6 +23,18 @@ decisions briefly in `docs/architecture.md` and maintenance details in
 generated file, asset, or deployment setting is involved. Prefer plain language
 that helps a future reader understand why each part exists.
 
+Before finishing a change, inspect `README.md`, `TODO.md`, and the relevant
+`docs/` files, including `docs/changelog.md`. Update each file whose stated
+purpose applies; add a dated changelog entry for completed behavior or
+project-decision changes. Then check that the documentation matches the
+implementation.
+
+When a review question reveals non-obvious behavior, add or improve a concise
+explanation beside the relevant code or configuration, or in its documentation.
+Keep the explanation useful for future readers rather than recording the conversation.
+Give each topic one primary home and link to it from other documents; avoid
+repeating procedures, security explanations, and setup status across files.
+
 This site is currently prerendered and is not deployed by ordinary build work.
 Do not edit `package-lock.json` or `worker-configuration.d.ts` by hand. Update
 the social card PNG when changing its SVG source. Do not commit `.env` or logs.

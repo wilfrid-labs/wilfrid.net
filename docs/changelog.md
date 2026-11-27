@@ -2,6 +2,15 @@
 
 Short notes on user-visible changes and decisions. Keep entries brief; detailed setup belongs in the maintenance notes and architecture decisions.
 
+## 2026-11-26
+
+- Consolidated documentation by purpose, shortened repeated explanations, and linked shared details to their primary location.
+
+- Added secret-free pull request validation and guarded GitHub Actions deployment to Cloudflare Workers, with SHA-pinned Actions and monthly Dependabot updates.
+- Documented CI/CD security decisions, manual GitHub setup, and first-deployment checks. No deployment or remote settings changes were made.
+- Clarified Action pins, manual dispatch, Wrangler installation, and the absence of staging. Split initial deployment, security risks, and PR guidance into focused documents.
+- Tracked production build/deployment isolation as a security follow-up and documented the maintainer-confirmed availability of private vulnerability reporting.
+
 ## 2026-11-17
 
 - Refined the landing page copy, project links and years, colors, and contact layout.

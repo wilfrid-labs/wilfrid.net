@@ -1,0 +1,70 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Enables a manual run via Actions > Deploy > Run workflow (or the CLI/API).
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # A manual run (workflow_dispatch) can select another branch or tag.
+    # Check the branch before accessing production;
+    # the repository guard also prevents accidental deployment from a fork.
+    if: github.repository == 'wilfrid-labs/wilfrid.net' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    concurrency:
+      group: production
+      # Let an active upload finish; GitHub may replace an older pending run.
+      cancel-in-progress: false
+    steps:
+      - name: Check out source
+        # Pin GitHub's source checkout Action to the exact commit for this release.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Deploy the triggering commit, even if main advances while queued.
+          ref: ${{ github.sha }}
+          # Build scripts do not need reusable Git authentication credentials.
+          persist-credentials: false
+
+      - name: Set up Node.js
+        # Pin the setup Action's code; node-version below selects our build runtime.
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        # Installs Astro AND our direct Wrangler devDependency from package-lock.json.
+        run: npm ci
+
+      - name: Check Astro and TypeScript
+        run: npm run check
+
+      - name: Build production site
+        env:
+          # Used only at build time to produce reversible obfuscated contact data.
+          CONTACT_EMAIL: ${{ secrets.CONTACT_EMAIL }}
+        run: |
+          # CI allows an absent address; production must retain the contact control.
+          if [ -z "$CONTACT_EMAIL" ]; then
+            echo "::error::The production CONTACT_EMAIL secret is empty or unavailable."
+            exit 1
+          fi
+          npm run build
+
+      - name: Deploy to Cloudflare Workers
+        # Earlier steps share this runner and could tamper with later tooling.
+        # Step-scoped credentials reduce exposure, not process isolation; see SECURITY.md.
+        env:
+          # Keep Cloudflare credentials out of installation, checking, and building.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # npm ci above installed Wrangler; Astro only builds the deployment output.
+        # --no-install disables fetching a missing CLI here; use the installed version.
+        # Wrangler reads Astro's generated config without rebuilding the site.
+        run: npx --no-install wrangler deploy

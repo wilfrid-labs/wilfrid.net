@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    # Routine updates share one PR; major upgrades remain separate for review.
+    groups:
+      github-actions:
+        patterns: ['*']
+        update-types: [minor, patch]
