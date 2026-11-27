@@ -16,6 +16,8 @@ The [isolation follow-up](TODO.md#ideas-to-explore) evaluates fresh build/deploy
 
 Scope the Cloudflare token to the intended account and required permissions. Rotate it periodically and after suspected exposure: replace the existing environment secret and revoke the old token. Treat incident logs and generated files as potentially sensitive.
 
+Cloudflare's GitHub App is not installed and Cloudflare receives no GitHub repository permissions; GitHub Actions owns deployment. Domain/DNS administration stays manual, outside the deployment token's privileges. The production URL flags need no additional domain, route, or DNS permissions; see [deployment validation](docs/maintenance.md#production-domain-and-deployment-validation) for the API and installed-tool checks. Future PR previews must retain the current secret-free PR trust boundary; their separate credentials and isolation are [deferred work](TODO.md#deferred-cicd-improvements).
+
 Secret names and GitHub settings paths are configuration metadata: documenting them does not reveal values or grant access. Publish only necessary metadata, never actual tokens, account IDs, personal addresses, or sensitive logs. Protect repository/environment access, account security, and workflow code.
 
 See [secret configuration](docs/maintenance.md#existing-environment-secrets) for step scopes and [initial setup](docs/first-deployment.md) for repository protections. Email obfuscation is explained in [maintenance](docs/maintenance.md#configuring-email-without-committing-it).

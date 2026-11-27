@@ -19,15 +19,24 @@ The site uses a white background, dark text, and a muted blue accent. Georgia he
 
 ## Cloudflare routing, redirects, and 404 responses
 
-The homepage is prerendered; ordinary builds generate local output. GitHub Actions publishes through Wrangler on `main`. Deployment verification is tracked in the [initial checklist](first-deployment.md); outstanding routing features are in [TODO.md](../TODO.md).
+The homepage is prerendered; ordinary builds generate local output. GitHub Actions publishes through Wrangler on `main`. The site is live at `https://wilfrid.net/`. Outstanding routing features are in [TODO.md](../TODO.md).
 
 ### Deployment addresses
 
-Cloudflare assigns each Worker a default website address under `workers.dev`, such as `https://wilfrid-net.<account-subdomain>.workers.dev`. When enabled, this address serves the deployed site without requiring a custom domain. It can coexist with `wilfrid.net` or be disabled if only the custom domain should serve the site. It is not a Cloudflare management API endpoint or a separate staging environment. See [Cloudflare’s workers.dev guide](https://developers.cloudflare.com/workers/configuration/routing/workers-dev/). The decision about retaining this additional public address is tracked in [TODO.md](../TODO.md#deployment-and-routing).
+`https://wilfrid.net/` is canonical in Astro configuration, page metadata, and absolute social-image URLs. No sitemap or robots file is currently generated.
+
+| Mechanism | Purpose and project decision |
+| --- | --- |
+| Production `workers.dev` | The current production Worker at `wilfrid-net.wilfrid-apps.workers.dev`; disabled by `workers_dev: false` after the next deployment. `wilfrid-apps` is the account-wide namespace. |
+| Worker Version URLs | Public URLs for individual uploaded versions, including aliases; use that version's production resources. Disabled by `preview_urls: false` after deployment. These are not isolated PR environments. |
+| Worker Previews | Branch/PR environments under a Worker, created with `wrangler preview` and configured separately through `previews`. They have their own settings and URLs; binding resource isolation must be evaluated explicitly. Planned, not implemented. |
+| Separate Workers / Wrangler environments | Independently deployed Workers (for example, `wrangler deploy --env staging`) with explicit configuration and resource boundaries. Persistent staging remains deferred. |
+
+Cloudflare now calls the old preview URLs **Version URLs**, while the Wrangler field remains `preview_urls`. Production flags do not abandon future PR previews: a future preview configuration must explicitly enable its own URL host and isolate credentials and resources. See [workers.dev](https://developers.cloudflare.com/workers/configuration/routing/workers-dev/), [Version URLs](https://developers.cloudflare.com/workers/versions-and-deployments/version-urls/), [workflow comparison](https://developers.cloudflare.com/workers/previews/compare-workflows/), and [Preview configuration](https://developers.cloudflare.com/workers/previews/configuration/).
 
 ### Routing decisions
 
-- **Cloudflare routing:** Cloudflare determines which Worker handles incoming HTTP requests. Prefer a Workers Custom Domain for the main website. `Workers Routes Write` is only needed when managing Workers route associations; do not assume it is required for every deployment.
+- **Cloudflare routing:** The `wilfrid.net` Custom Domain is already attached to `wilfrid-net` manually in Cloudflare. The dashboard also manages the permanent `www.wilfrid.net` → apex redirect, preserving paths and query strings. Keep domain and DNS management outside CI: omit Wrangler `routes` and `custom_domain` declarations. Updating the same Worker preserves its existing Custom Domain association; no routing or DNS write permissions are needed for these flag changes. See [maintenance](maintenance.md#production-domain-and-deployment-validation) for validation and post-deploy checks.
 - **Astro routing:** Astro handles application pages, redirects, and 404 responses. Do not create Cloudflare routes for individual Astro pages.
 - **Moved pages:** Preserve old bookmarks and inbound links with permanent HTTP 301 redirects configured in Astro and version-controlled.
 - **Unknown URLs:** Return a genuine HTTP 404 with a friendly page explaining that the URL may be incorrect, deleted, or moved. Include a homepage link and helpful suggestions.
@@ -45,7 +54,7 @@ Track outstanding implementation work in [TODO.md](../TODO.md).
 | Ubuntu 24.04 | Compatible, economical Linux runner with a stable major OS version. The maintained image receives updates and is not immutable; it is independent of local Windows development. |
 | Node.js 24 LTS | The locked Astro, Vite, and Wrangler engine ranges support it. LTS gives build tooling a maintained baseline; pinning the major allows patch and minor maintenance updates. |
 | Separate CI and deployment workflows | PR validation has no production environment or secrets; deployment checks again after merge. |
-| Protected `main` branch (manual setup pending) | Require a PR and successful `validate` check before changes reach production. |
+| Protected `main` branch (settings still require owner verification) | Require a PR and successful `validate` check before changes reach production. |
 | Read-only `GITHUB_TOKEN` | Both workflows request only `contents: read`; other permissions are unset. |
 | Checkout without persisted credentials | Build scripts have no reusable Git authentication stored by checkout. |
 | Full-SHA Action pinning | Mutable upstream tags cannot silently change the selected Action code. |
@@ -62,4 +71,4 @@ See [SECURITY.md](../SECURITY.md) for trust boundaries and remaining risks, and 
 
 ## Future staging
 
-Add staging when SSR, Cloudflare bindings, databases, authentication, or other runtime behavior makes it useful. Prefer a separate Worker and least-privilege API token, the same account ID if appropriate, a test email or a build without a real address, and explicit staging deployment restrictions. This implementation creates no staging resources, workflow, or secrets.
+Evaluate persistent staging after isolated PR previews, especially when SSR, bindings, databases, or authentication make it useful. Neither is implemented. Requirements and trade-offs have one tracking home in [deferred CI/CD improvements](../TODO.md#deferred-cicd-improvements).

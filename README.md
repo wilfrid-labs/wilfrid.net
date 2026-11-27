@@ -29,9 +29,9 @@ Run `npm.cmd run check` for Astro and TypeScript diagnostics, and `npm.cmd run b
 
 ## CI and deployment
 
-PRs to `main` run validation; merging triggers Cloudflare Workers deployment. CI publishes no staging site. See the [contribution workflow](CONTRIBUTING.md) and [deployment operations](docs/maintenance.md#github-actions-deployment).
+The site is live at **https://wilfrid.net/**, its canonical URL. PRs to `main` run validation; merging triggers GitHub Actions deployment to Cloudflare Workers. PR previews and staging are [planned, not implemented](TODO.md#deferred-cicd-improvements). See the [contribution workflow](CONTRIBUTING.md) and [deployment operations](docs/maintenance.md#github-actions-deployment).
 
-Before the first deployment, complete the [initial setup checklist](docs/first-deployment.md).
+See the [setup record](docs/first-deployment.md) for completed infrastructure setup and remaining protection checks.
 
 ## Project notes
 

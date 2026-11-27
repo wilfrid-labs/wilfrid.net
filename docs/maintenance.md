@@ -1,6 +1,6 @@
 # Maintenance notes
 
-Operational instructions for the site. See [architecture](architecture.md) for design decisions, [security](../SECURITY.md) for risks, and [initial setup](first-deployment.md) for first-deployment checks.
+Operational instructions for the site. See [architecture](architecture.md) for design decisions, [security](../SECURITY.md) for risks, and the [setup record](first-deployment.md) for completed setup and remaining protection checks.
 
 ## Local development
 
@@ -83,6 +83,26 @@ The [PR process](../CONTRIBUTING.md) leads to these workflows:
 “Dispatch” means a manual `workflow_dispatch` request. Use **Actions → Deploy → Run workflow → main** (or the CLI/API). Other branches/tags are skipped; existing environment approvals still apply. Prefer a new dispatch on current `main`: rerunning an old run redeploys its original commit.
 
 Production concurrency lets an active deployment finish without overlap; GitHub can replace older pending runs, so it is not a strict queue. Runtime and security rationales are in [architecture](architecture.md#cicd-design-decisions).
+
+### Production domain and deployment validation
+
+The live `wilfrid.net` Custom Domain and permanent `www` redirect are managed manually in Cloudflare. DNS and DNSSEC migration are complete; Cloudflare provides DNS and OVHcloud remains the registrar. The legacy parking A record was removed. Do not repeat this setup or add route/domain/DNS management to Wrangler or Actions.
+
+`workers_dev: false` disables `wilfrid-net.wilfrid-apps.workers.dev`; `preview_urls: false` disables production Version URLs, including aliases. These settings take effect only after deployment. Future Worker Previews require separate settings; see [deployment addresses](architecture.md#deployment-addresses).
+
+Validated against installed Wrangler **4.163.0** and current Cloudflare documentation on 2026-11-27. Its schema accepts both booleans. Its deploy implementation updates the Worker's `/subdomain` endpoint; it only publishes routes or Custom Domains when their respective configured lists are nonempty. With no `routes`/`route` declarations and the same Worker name, deployment leaves the existing Custom Domain attached. The [subdomain API](https://developers.cloudflare.com/api/resources/workers/subresources/scripts/subresources/subdomain/methods/create/) accepts Workers Scripts Write; no additional domain, route, or DNS write permission should be needed. Actual token scope has not been inspected locally.
+
+For local validation without publishing:
+
+```sh
+npm.cmd run check
+npm.cmd run build
+npx.cmd --no-install wrangler deploy --dry-run
+```
+
+Inspect `dist/client/index.html` for canonical/`og:url` equal to `https://wilfrid.net/` and `og:image` equal to `https://wilfrid.net/social-card.png`. Check that `dist/client/wrangler.json` retains both false flags, the Worker name and compatibility settings, and omits routing declarations. The source config retains the entrypoint and `ASSETS` binding; for the current entirely static output, Astro removes the runtime entrypoint/binding and emits an assets-only deployment. The dry run validates the same generated config used by Actions; it does not prove remote token scope or live routing.
+
+After merging and the normal Actions deployment succeeds, verify the deployed commit and `https://wilfrid.net/`, page metadata, social image, and email reveal/open/copy behavior. Check that `https://www.wilfrid.net/<path>?<query>` permanently redirects to the same apex path/query. Confirm in **Worker → Settings → Domains & Routes** that the Custom Domain remains attached and production `workers.dev` and Version URLs are disabled; test the old production URL and a previously known Version URL no longer serve the site. Do not create replacement URLs or change dashboard settings for this check.
 
 ### Existing environment secrets
 

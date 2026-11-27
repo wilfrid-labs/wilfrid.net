@@ -2,6 +2,12 @@
 
 Short notes on user-visible changes and decisions. Keep entries brief; detailed setup belongs in the maintenance notes and architecture decisions.
 
+## 2026-11-27
+
+- Configured production `workers.dev` and Worker Version URLs off for the next deployment, preserving the manually attached Custom Domain and deployment-only CI permissions.
+- Recorded the live canonical site, completed DNS/DNSSEC migration, and ongoing GitHub Actions operations; distinguished Worker Previews from Version URLs.
+- Added deferred PR preview deployment and staging evaluation requirements to the existing TODO backlog. No preview/staging resources or production deployment were created.
+
 ## 2026-11-26
 
 - Consolidated documentation by purpose, shortened repeated explanations, and linked shared details to their primary location.
