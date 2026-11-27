@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  # Always report validate for every PR to main, including documentation changes.
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # Validation only: this job publishes no preview URL or staging deployment.
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        # Run GitHub's checkout Action to copy this PR's source onto the runner.
+        # @ selects its exact code commit; the version comment labels that release.
+        # A full SHA prevents a moved release tag from silently changing the code.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Build scripts do not need reusable Git authentication credentials.
+          persist-credentials: false
+
+      - name: Set up Node.js
+        # Run GitHub's setup-node Action to select Node and cache npm downloads.
+        # This SHA pins the Action's code, while node-version selects our build runtime.
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Astro and TypeScript
+        run: npm run check
+
+      # EmailReveal already renders its unavailable state without CONTACT_EMAIL.
+      # Keep PR code outside the production environment and free of its secrets.
+      - name: Build without production secrets
+        run: npm run build

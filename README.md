@@ -18,18 +18,26 @@ Built with **Astro, TypeScript, and plain CSS**, it reflects a preference for si
 
 ## Run locally
 
-Use the Node version specified in `package.json`, then:
+Use Node.js 24 LTS (compatible with the minimum in `package.json`), then on Windows:
 
 ```sh
-npm ci
-npm run dev -- --background
+npm.cmd ci
+npm.cmd run dev -- --background
 ```
 
-Run `npm run check` for Astro and TypeScript diagnostics, and `npm run build` to generate the production output locally. See the [maintenance guide](docs/maintenance.md#local-development) for server controls and setup details.
+Run `npm.cmd run check` for Astro and TypeScript diagnostics, and `npm.cmd run build` to generate the production output locally. Configure optional `CONTACT_EMAIL` in an ignored `.env` file. See the [maintenance guide](docs/maintenance.md#local-development) for server controls and setup details.
+
+## CI and deployment
+
+PRs to `main` run validation; merging triggers Cloudflare Workers deployment. CI publishes no staging site. See the [contribution workflow](CONTRIBUTING.md) and [deployment operations](docs/maintenance.md#github-actions-deployment).
+
+Before the first deployment, complete the [initial setup checklist](docs/first-deployment.md).
 
 ## Project notes
 
 - [Architecture](docs/architecture.md) — technical choices and visual design.
 - [Maintenance](docs/maintenance.md) — editing, local development, email configuration, and deployment details.
+- [Contributing](CONTRIBUTING.md) — feature branches, PR review, validation, and merging.
+- [Security](SECURITY.md) — deployment trust, credential handling, and remaining risks.
 - [Todo](TODO.md) — outstanding work and ideas.
 - [Change log](docs/changelog.md) — brief project history.
